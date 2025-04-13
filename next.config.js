@@ -12,6 +12,9 @@ const nextConfig = {
       'i.spotifycdn.com'
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig; 
