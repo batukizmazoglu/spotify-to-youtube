@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Spotify'dan YouTube'a Şarkı Listesi Aktarımı
 
-## Getting Started
+Bu proje [Next.js](https://nextjs.org) kullanılarak geliştirilmiş, Spotify çalma listelerinizi YouTube çalma listelerine aktarmanızı sağlayan bir web uygulamasıdır.
 
-First, run the development server:
+## Başlangıç
+
+İlk olarak, geliştirme sunucusunu başlatın:
 
 ```bash
 npm run dev
-# or
+# veya
 yarn dev
-# or
+# veya
 pnpm dev
-# or
+# veya
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açarak uygulamayı görebilirsiniz.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Ortam Değişkenleri
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Projenin çalışabilmesi için API anahtarlarının doğru şekilde ayarlanması gerekmektedir:
 
-## Learn More
+1. Projenin kök dizininde `.env.local` dosyası oluşturun
+2. `.env.example` dosyasındaki değişkenleri `.env.local` dosyasına kopyalayın
+3. Kendi API anahtarlarınızla değiştirin:
+   - Spotify API anahtarları: [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
+   - Google API anahtarları: [Google Cloud Console](https://console.cloud.google.com/)
 
-To learn more about Next.js, take a look at the following resources:
+**Önemli Not:** `.env.local` dosyası hassas bilgiler içerdiği için asla GitHub'a yüklenMEMELİDİR. Bu dosya `.gitignore` içerisinde belirtilmiştir.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Daha Fazla Bilgi
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Next.js hakkında daha fazla bilgi edinmek için aşağıdaki kaynaklara bakabilirsiniz:
 
-## Deploy on Vercel
+- [Next.js Dokümantasyonu](https://nextjs.org/docs) - Next.js özellikleri ve API'si hakkında bilgi edinin.
+- [Next.js Öğrenin](https://nextjs.org/learn) - interaktif Next.js öğreticisi.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Vercel Üzerinde Dağıtım
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js uygulamanızı dağıtmanın en kolay yolu, Next.js'in yaratıcıları tarafından sağlanan [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) kullanmaktır.
+
+Daha fazla ayrıntı için [Next.js dağıtım dokümantasyonumuza](https://nextjs.org/docs/app/building-your-application/deploying) göz atabilirsiniz.
