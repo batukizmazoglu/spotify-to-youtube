@@ -3,39 +3,39 @@ import { getSpotifyToken } from '@/utils/spotify';
 
 export async function GET(request: Request) {
   try {
-    // URL'den parametreleri al
+    // Get parameters from URL
     const url = new URL(request.url);
     const code = url.searchParams.get('code');
     const error = url.searchParams.get('error');
 
-    // Hata kontrolü
+    // Error check
     if (error) {
       return NextResponse.redirect(new URL(`/login?error=${error}`, url.origin));
     }
 
-    // Code kontrolü
+    // Code check
     if (!code) {
       return NextResponse.redirect(new URL('/login?error=no_code', url.origin));
     }
 
-    // Spotify token al
+    // Get Spotify token
     const clientId = process.env.SPOTIFY_CLIENT_ID || '8f0b9e6febfe4ca18bc90f84078d672a';
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET || '5d04c84ca4544d15a64290d779a3b394';
     const redirectUri = `${url.origin}/api/spotify-callback`;
 
-    // Spotify token'ı al
+    // Get Spotify token
     const tokenData = await getSpotifyToken(code, clientId, clientSecret, redirectUri);
     
-    // Token alındıktan sonra token=true parametresi ekleyerek yönlendir
-    // tokenData kullanılarak cookie yerine URL'e token hash eklenebilir
-    const tokenHash = tokenData.access_token.substring(0, 8); // ilk 8 karakteri güvenlik için al
+    // After getting the token, redirect with token=true parameter
+    // URL token hash can be added instead of cookie using tokenData
+    const tokenHash = tokenData.access_token.substring(0, 8); // take first 8 characters for security
     
-    // Başarı URL'si ile yönlendir
+    // Redirect with success URL
     return NextResponse.redirect(
       new URL(`/login?spotify=connected&token_received=true&hash=${tokenHash}`, url.origin)
     );
   } catch (error) {
-    console.error('Spotify callback işlenirken hata oluştu:', error);
+    console.error('Error processing Spotify callback:', error);
     return NextResponse.redirect(new URL('/login?error=server_error', new URL(request.url).origin));
   }
 } 

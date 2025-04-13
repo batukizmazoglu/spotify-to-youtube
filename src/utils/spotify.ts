@@ -1,4 +1,4 @@
-// Spotify API yardımcı fonksiyonları
+// Spotify API helper functions
 import axios from 'axios';
 
 interface SpotifyPlaylist {
@@ -25,7 +25,7 @@ interface SpotifyTokenResponse {
   scope: string;
 }
 
-// Spotify API'a istek yapmak için
+// For making requests to Spotify API
 export const fetchSpotifyPlaylists = async (accessToken: string): Promise<SpotifyPlaylist[]> => {
   try {
     const response = await axios.get('https://api.spotify.com/v1/me/playlists', {
@@ -35,12 +35,12 @@ export const fetchSpotifyPlaylists = async (accessToken: string): Promise<Spotif
     });
     return response.data.items;
   } catch (error) {
-    console.error('Spotify çalma listeleri alınırken hata oluştu:', error);
+    console.error('Error retrieving Spotify playlists:', error);
     throw error;
   }
 };
 
-// Spotify çalma listesindeki parçaları al
+// Get tracks from a Spotify playlist
 export const fetchPlaylistTracks = async (accessToken: string, playlistId: string): Promise<{
   track: {
     name: string;
@@ -57,12 +57,12 @@ export const fetchPlaylistTracks = async (accessToken: string, playlistId: strin
     });
     return response.data.items;
   } catch (error) {
-    console.error(`Çalma listesi parçaları alınırken hata oluştu (${playlistId}):`, error);
+    console.error(`Error retrieving playlist tracks (${playlistId}):`, error);
     throw error;
   }
 };
 
-// Spotify OAuth URL oluşturma
+// Create Spotify OAuth URL
 export const getSpotifyAuthUrl = (clientId: string, redirectUri: string): string => {
   const scope = 'playlist-read-private playlist-read-collaborative';
   return `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(
@@ -70,7 +70,7 @@ export const getSpotifyAuthUrl = (clientId: string, redirectUri: string): string
   )}&scope=${encodeURIComponent(scope)}`;
 };
 
-// Spotify access token alma
+// Get Spotify access token
 export const getSpotifyToken = async (
   code: string,
   clientId: string,
@@ -93,7 +93,7 @@ export const getSpotifyToken = async (
     });
     return tokenResponse.data;
   } catch (error) {
-    console.error('Spotify erişim tokeni alınırken hata oluştu:', error);
+    console.error('Error getting Spotify access token:', error);
     throw error;
   }
 }; 

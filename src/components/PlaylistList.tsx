@@ -9,7 +9,7 @@ import Image from 'next/image';
 interface Playlist {
   id: string;
   name: string;
-  images?: { url: string }[]; // images dizisi opsiyonel olabilir
+  images?: { url: string }[]; // images array may be optional
   tracks: { total: number };
   owner: { display_name: string };
 }
@@ -26,11 +26,11 @@ export default function PlaylistList() {
     playlistName: string;
   } | null>(null);
 
-  // Spotify çalma listelerini yükle
+  // Load Spotify playlists
   useEffect(() => {
     const loadPlaylists = async () => {
       if (!spotifyToken) {
-        setError('Spotify erişim tokeni yok. Lütfen tekrar giriş yapın.');
+        setError('No Spotify access token. Please log in again.');
         setLoading(false);
         return;
       }
@@ -41,8 +41,8 @@ export default function PlaylistList() {
         setPlaylists(playlistData);
         setLoading(false);
       } catch (err) {
-        console.error('Çalma listeleri yüklenirken hata oluştu:', err);
-        setError('Çalma listeleri yüklenemedi. Lütfen daha sonra tekrar deneyin.');
+        console.error('Error loading playlists:', err);
+        setError('Could not load playlists. Please try again later.');
         setLoading(false);
       }
     };
@@ -50,7 +50,7 @@ export default function PlaylistList() {
     loadPlaylists();
   }, [spotifyToken]);
 
-  // Çalma listesi seçim durumunu değiştir
+  // Toggle playlist selection state
   const togglePlaylist = (playlistId: string) => {
     setSelectedPlaylists(prev => 
       prev.includes(playlistId)
@@ -59,71 +59,71 @@ export default function PlaylistList() {
     );
   };
 
-  // Aktarma fonksiyonu ekleyelim
+  // Add transfer function
   const transferSelectedPlaylists = async () => {
     if (!spotifyToken) {
-      setError('Spotify erişim tokeni yok. Lütfen tekrar giriş yapın.');
+      setError('No Spotify access token. Please log in again.');
       return;
     }
     
     if (!youtubeToken) {
-      setError('YouTube erişim tokeni yok. Lütfen tekrar giriş yapın.');
+      setError('No YouTube access token. Please log in again.');
       return;
     }
     
     try {
-      // Aktarma işlemi başlıyor
+      // Transfer process is starting
       setLoading(true);
       setError(null);
       setTransferProgress(null);
       
-      console.log('Token tipini kontrol ediyorum...');
-      // Token formatı kontrolü ekle
+      console.log('Checking token type...');
+      // Add token format check
       if (typeof window !== 'undefined') {
-        // localStorage'dan auth header'ı kontrol et
+        // Check auth header in localStorage
         const authHeader = localStorage.getItem('google_auth_header');
         if (!authHeader) {
-          console.log('Auth header bulunamadı, oluşturuluyor...');
+          console.log('Auth header not found, creating...');
           localStorage.setItem('google_auth_header', `Bearer ${youtubeToken}`);
         }
       }
       
-      // Seçilen çalma listeleri için döngü
+      // Loop for selected playlists
       for (const playlistId of selectedPlaylists) {
-        // Şu anki çalma listesini bul
+        // Find current playlist
         const playlist = playlists.find(p => p.id === playlistId);
         if (!playlist) continue;
         
-        // İlerleme göstergesini güncelleyelim
+        // Update progress indicator
         setTransferProgress({
           current: 0,
           total: playlist.tracks.total,
           playlistName: playlist.name
         });
         
-        // Çalma listesi şarkılarını getir
+        // Get playlist tracks
         const tracks = await fetchPlaylistTracks(spotifyToken, playlistId);
-        console.log(`${playlist.name} çalma listesinden ${tracks.length} şarkı alındı`);
+        console.log(`Retrieved ${tracks.length} songs from playlist ${playlist.name}`);
         
-        // YouTube'da yeni çalma listesi oluştur
+        // Create new playlist on YouTube
         const youtubePlaylistId = await createYouTubePlaylist(
           youtubeToken,
-          `${playlist.name} (Spotify'dan aktarıldı)`,
-          `Bu çalma listesi Spotify'dan otomatik olarak aktarılmıştır.`
+          `${playlist.name} (Transferred from Spotify)`,
+          `This playlist was automatically transferred from Spotify.`
         );
         
-        // Her şarkı için YouTube'da arama yapıp çalma listesine ekle
+        // Search for each song on YouTube and add to playlist
         let successfulTransfers = 0;
-        const failedTransfers: string[] = []; // Başarısız aktarımları tutacak dizi
+        const failedTransfers: string[] = []; // Array to hold failed transfers
         
         for (let i = 0; i < tracks.length; i++) {
           const item = tracks[i];
           if (!item.track) {
-            console.log(`${i+1}. öğe geçerli bir şarkı değil, atlanıyor`);
+            console.log(`Item ${i+1} is not a valid track, skipping`);
             continue;
           }
           
-          // İlerlemeyi güncelle
+          // Update progress
           setTransferProgress({
             current: i + 1,
             total: tracks.length,
@@ -131,58 +131,58 @@ export default function PlaylistList() {
           });
           
           try {
-            // Şarkı için arama sorgusu oluştur
+            // Create search query for the song
             const artistNames = item.track.artists.map((a: { name: string }) => a.name).join(' ');
             const searchQuery = `${item.track.name} ${artistNames}`;
-            console.log(`Aranan şarkı (${i+1}/${tracks.length}): "${item.track.name}" - ${artistNames}`);
+            console.log(`Searching song (${i+1}/${tracks.length}): "${item.track.name}" - ${artistNames}`);
             
-            // YouTube'da ara
+            // Search on YouTube
             const videoId = await searchYouTubeVideo(youtubeToken, searchQuery);
             
-            // Eğer video bulunduysa çalma listesine ekle
+            // If video found, add to playlist
             if (videoId) {
-              // API istek sayısını sınırlamak için kısa bir gecikme
+              // Short delay to limit API request rate
               await new Promise(resolve => setTimeout(resolve, 500));
               
               const result = await addVideoToPlaylist(youtubeToken, youtubePlaylistId, videoId);
               if (result) {
                 successfulTransfers++;
-                console.log(`Şarkı eklendi (${successfulTransfers}/${tracks.length}): ${item.track.name}`);
+                console.log(`Song added (${successfulTransfers}/${tracks.length}): ${item.track.name}`);
               } else {
                 failedTransfers.push(`${item.track.name} - ${artistNames}`);
-                console.error(`Şarkı eklenemedi: ${item.track.name}`);
+                console.error(`Failed to add song: ${item.track.name}`);
               }
             } else {
               failedTransfers.push(`${item.track.name} - ${artistNames}`);
-              console.log(`Şarkı bulunamadı: ${item.track.name}`);
+              console.log(`Song not found: ${item.track.name}`);
             }
           } catch (error) {
             failedTransfers.push(`${item.track.name} - ${item.track.artists.map((a: { name: string }) => a.name).join(' ')}`);
-            console.error(`Şarkı aktarılırken hata: ${item.track.name}`, error);
+            console.error(`Error transferring song: ${item.track.name}`, error);
           }
         }
         
-        // Başarısız şarkıları loglayalım
+        // Log failed songs
         if (failedTransfers.length > 0) {
-          console.log(`\n${failedTransfers.length} şarkı aktarılamadı:`);
+          console.log(`\n${failedTransfers.length} songs could not be transferred:`);
           failedTransfers.forEach((song, index) => {
             console.log(`${index + 1}. ${song}`);
           });
         }
         
-        console.log(`${playlist.name} listesi için aktarım tamamlandı. ${successfulTransfers}/${tracks.length} şarkı başarıyla aktarıldı.`);
+        console.log(`Transfer complete for ${playlist.name}. Successfully transferred ${successfulTransfers}/${tracks.length} songs.`);
       }
       
-      // İşlem tamamlandı
+      // Process complete
       setLoading(false);
       setTransferProgress(null);
-      alert('Çalma listeleri başarıyla YouTube\'a aktarıldı!');
+      alert("Playlists successfully transferred to YouTube!");
       
-      // Seçimleri temizle
+      // Clear selections
       setSelectedPlaylists([]);
     } catch (err) {
-      console.error('Aktarma sırasında hata oluştu:', err);
-      setError('Çalma listelerini aktarırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      console.error('Error during transfer:', err);
+      setError('An error occurred while transferring playlists. Please try again later.');
       setLoading(false);
       setTransferProgress(null);
     }
@@ -199,22 +199,39 @@ export default function PlaylistList() {
   if (transferProgress) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[200px] p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+        <h3 className="text-xl font-semibold mb-6 text-gray-800 dark:text-white">
           Aktarılıyor: {transferProgress.playlistName}
         </h3>
-        <div className="w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-2">
-          <div 
-            className="bg-blue-600 h-4 rounded-full transition-all duration-500" 
-            style={{ width: `${Math.round((transferProgress.current / transferProgress.total) * 100)}%` }}
-          ></div>
+        
+        <div className="w-full max-w-md mb-6">
+          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <span>İlerleme</span>
+            <span>{Math.round((transferProgress.current / transferProgress.total) * 100)}%</span>
+          </div>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+            <div 
+              className="bg-blue-600 h-4 rounded-full transition-all duration-500 flex items-center justify-center text-xs text-white"
+              style={{ width: `${Math.max(5, Math.round((transferProgress.current / transferProgress.total) * 100))}%` }}
+            >
+              {transferProgress.current > transferProgress.total / 4 && `${transferProgress.current}/${transferProgress.total}`}
+            </div>
+          </div>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
-          {transferProgress.current} / {transferProgress.total} şarkı
-          ({Math.round((transferProgress.current / transferProgress.total) * 100)}%)
-        </p>
-        <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-          Bu işlem biraz zaman alabilir. Lütfen sayfayı kapatmayın.
-        </p>
+        
+        <div className="text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+            {transferProgress.current} / {transferProgress.total} şarkı aktarıldı
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Bu işlem biraz zaman alabilir. Lütfen sayfayı kapatmayın.
+          </p>
+        </div>
+        
+        <div className="mt-8 animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11l7-7 7 7M5 19l7-7 7 7" />
+          </svg>
+        </div>
       </div>
     );
   }
@@ -230,7 +247,7 @@ export default function PlaylistList() {
   if (playlists.length === 0) {
     return (
       <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-        <p>Hiç çalma listeniz yok veya bu uygulamaya erişim izni vermediniz.</p>
+        <p>You don't have any playlists or you didn't grant access to this application.</p>
       </div>
     );
   }
@@ -241,67 +258,97 @@ export default function PlaylistList() {
         Spotify Çalma Listeleriniz
       </h2>
       
+      <div className="mb-4 flex flex-wrap gap-2">
+        <button
+          onClick={() => setSelectedPlaylists(playlists.map(p => p.id))}
+          className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+        >
+          Tümünü Seç
+        </button>
+        <button
+          onClick={() => setSelectedPlaylists([])}
+          className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md transition-colors"
+        >
+          Seçimi Temizle
+        </button>
+        {selectedPlaylists.length > 0 && (
+          <button
+            onClick={transferSelectedPlaylists}
+            className="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-md ml-auto transition-colors flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7l4-4m0 0l4 4m-4-4v18" />
+            </svg>
+            {selectedPlaylists.length} Çalma Listesini Aktar
+          </button>
+        )}
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {playlists.map(playlist => (
           <div
             key={playlist.id}
-            className={`border rounded-lg overflow-hidden transition-all duration-200 ${
+            onClick={() => togglePlaylist(playlist.id)}
+            className={`border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg cursor-pointer ${
               selectedPlaylists.includes(playlist.id)
-                ? 'border-blue-500 shadow-md bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700'
+                ? 'border-blue-500 shadow-md bg-blue-50 dark:bg-blue-900/20 transform scale-[1.02]'
+                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
             }`}
           >
-            <div className="p-4 flex items-start space-x-3">
-              <div className="relative h-16 w-16 flex-shrink-0">
-                {playlist.images && playlist.images.length > 0 && playlist.images[0]?.url ? (
+            <div className="flex p-4">
+              <div className="flex-shrink-0 w-16 h-16 mr-4 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800 relative">
+                {playlist.images && playlist.images.length > 0 ? (
                   <Image
                     src={playlist.images[0].url}
                     alt={playlist.name}
                     fill
+                    className="object-cover"
                     sizes="64px"
-                    className="object-cover rounded"
                   />
                 ) : (
-                  <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                    <span className="text-gray-500 dark:text-gray-400">?</span>
+                  <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
                   </div>
                 )}
               </div>
-              
-              <div className="flex-1">
-                <h3 className="font-medium text-gray-900 dark:text-white truncate">{playlist.name}</h3>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate">{playlist.name}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {playlist.tracks.total} şarkı • {playlist.owner.display_name}
                 </p>
-                
-                <div className="mt-2">
-                  <button
-                    type="button"
-                    onClick={() => togglePlaylist(playlist.id)}
-                    className={`px-3 py-1 text-xs font-medium rounded-full ${
-                      selectedPlaylists.includes(playlist.id)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                    }`}
-                  >
-                    {selectedPlaylists.includes(playlist.id) ? 'Seçildi ✓' : 'Seç'}
-                  </button>
+                <div className="mt-2 flex items-center">
+                  <div className={`w-4 h-4 rounded-md mr-2 transition-colors ${
+                    selectedPlaylists.includes(playlist.id) ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}></div>
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    {selectedPlaylists.includes(playlist.id) ? 'Aktarım için seçildi' : 'Aktarmak için seçin'}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
-      
+
       {selectedPlaylists.length > 0 && (
-        <div className="mt-6 flex justify-end">
-          <button
-            type="button"
-            onClick={() => transferSelectedPlaylists()}
-            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-          >
-            {selectedPlaylists.length} Çalma Listesini YouTube&apos;a Aktar
-          </button>
+        <div className="mt-6 sticky bottom-4">
+          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div>
+              <span className="font-medium text-gray-800 dark:text-white">{selectedPlaylists.length} çalma listesi</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">aktarım için seçildi</span>
+            </div>
+            <button
+              onClick={transferSelectedPlaylists}
+              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7l4-4m0 0l4 4m-4-4v18" />
+              </svg>
+              Aktarımı Başlat
+            </button>
+          </div>
         </div>
       )}
     </div>

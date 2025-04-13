@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [spotifyToken, setSpotifyToken] = useState<string | null>(null);
   const [youtubeToken, setYoutubeToken] = useState<string | null>(null);
 
-  // LocalStorage'dan token'ları yükle
+  // Load tokens from LocalStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedSpotifyToken = localStorage.getItem('spotify_token');
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Token değiştiğinde localStorage'a kaydet
+  // Save to localStorage when token changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (spotifyToken) {
@@ -44,23 +44,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       if (youtubeToken) {
         try {
-          // Token'ı decode etmeden direkt kaydediyoruz
-          console.log('YouTube token alındı, kaydediliyor...');
+          // Save the token directly without decoding
+          console.log('YouTube token received, saving...');
           
-          // Token'ı kaydet
+          // Save token
           localStorage.setItem('youtube_token', youtubeToken);
           
-          // Google API için authorization header
-          // URL hash'ten alınan token, direkt API'de kullanılabilir
+          // Authorization header for Google API
+          // Token from URL hash can be used directly in API
           if (youtubeToken.startsWith('ya29.') || youtubeToken.length > 100) {
-            // Bu bir Google API access token 
+            // This is a Google API access token 
             localStorage.setItem('google_auth_header', `Bearer ${youtubeToken}`);
           } else {
-            // Bu bir ID token, API erişimi için uygun değil
-            console.warn('Google ID token kaydedildi, ancak API erişimi için yeterli olmayabilir.');
+            // This is an ID token, not suitable for API access
+            console.warn('Google ID token saved, but may not be sufficient for API access.');
           }
         } catch (error) {
-          console.error('YouTube token işlenirken hata:', error);
+          console.error('Error processing YouTube token:', error);
           localStorage.removeItem('youtube_token');
           localStorage.removeItem('google_auth_header');
         }

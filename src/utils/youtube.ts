@@ -1,4 +1,4 @@
-// YouTube API yardımcı fonksiyonları
+// YouTube API helper functions
 import axios from 'axios';
 
 interface YouTubeSearchResponse {
@@ -20,7 +20,7 @@ interface YouTubePlaylistResponse {
   };
 }
 
-// YouTube'da video arama
+// Search for a video on YouTube
 export const searchYouTubeVideo = async (accessToken: string, query: string): Promise<string | null> => {
   try {
     const response = await axios.get<YouTubeSearchResponse>('https://www.googleapis.com/youtube/v3/search', {
@@ -41,12 +41,12 @@ export const searchYouTubeVideo = async (accessToken: string, query: string): Pr
     
     return null;
   } catch (error) {
-    console.error('YouTube video araması yapılırken hata oluştu:', error);
+    console.error('Error searching for YouTube video:', error);
     throw error;
   }
 };
 
-// YouTube çalma listesi oluşturma
+// Create a YouTube playlist
 export const createYouTubePlaylist = async (
   accessToken: string,
   title: string,
@@ -76,12 +76,12 @@ export const createYouTubePlaylist = async (
     );
     return response.data.id;
   } catch (error) {
-    console.error('YouTube çalma listesi oluşturulurken hata oluştu:', error);
+    console.error('Error creating YouTube playlist:', error);
     throw error;
   }
 };
 
-// YouTube çalma listesine video ekleme
+// Add a video to a YouTube playlist
 export const addVideoToPlaylist = async (
   accessToken: string,
   playlistId: string,
@@ -111,7 +111,7 @@ export const addVideoToPlaylist = async (
     );
     return true;
   } catch (error) {
-    console.error('YouTube çalma listesine video eklenirken hata oluştu:', error);
+    console.error('Error adding video to YouTube playlist:', error);
     return false;
   }
 }; 
