@@ -1,12 +1,39 @@
 'use client';
 
+import { Suspense } from 'react';
+import { useAuth } from '@/context/AuthContext';
+
+// Loading component
+function Loading() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8 max-w-md w-full">
+        <div className="animate-pulse flex flex-col items-center justify-center">
+          <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-6"></div>
+          <div className="h-32 bg-gray-300 dark:bg-gray-600 rounded w-full mb-4"></div>
+          <div className="h-32 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main Login Page Component
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+// Client component that uses useSearchParams hook
 import { useEffect } from 'react';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function LoginPage() {
+function LoginContent() {
   const { isSpotifyConnected, isYoutubeConnected, setYoutubeToken, setSpotifyToken } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,12 +118,12 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8 max-w-md w-full">
         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">
-          Spotify'dan YouTube'a Aktarım
+          Spotify&apos;dan YouTube&apos;a Aktarım
         </h1>
         
         <div className="space-y-6">
-          <div className="p-5 border border-gray-200 dark:border-gray-700 rounded-lg relative 
-            ${isSpotifyConnected ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : ''}">
+          <div className={`p-5 border border-gray-200 dark:border-gray-700 rounded-lg relative 
+            ${isSpotifyConnected ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : ''}`}>
             
             {isSpotifyConnected && (
               <div className="absolute -top-3 -right-3 bg-green-500 text-white rounded-full p-1.5 shadow-md">
