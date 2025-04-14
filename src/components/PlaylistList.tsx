@@ -191,26 +191,26 @@ export default function PlaylistList() {
   if (loading && !transferProgress) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
   
   if (transferProgress) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[200px] p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-        <h3 className="text-xl font-semibold mb-6 text-gray-800 dark:text-white">
+      <div className="flex flex-col items-center justify-center min-h-[200px] p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-800 dark:text-white text-center">
           Aktarılıyor: {transferProgress.playlistName}
         </h3>
         
-        <div className="w-full max-w-md mb-6">
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+        <div className="w-full max-w-md mb-4 sm:mb-6 px-2">
+          <div className="flex justify-between text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">
             <span>İlerleme</span>
             <span>{Math.round((transferProgress.current / transferProgress.total) * 100)}%</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 sm:h-4 overflow-hidden">
             <div 
-              className="bg-blue-600 h-4 rounded-full transition-all duration-500 flex items-center justify-center text-xs text-white"
+              className="bg-blue-600 h-3 sm:h-4 rounded-full transition-all duration-500 flex items-center justify-center text-xs text-white"
               style={{ width: `${Math.max(5, Math.round((transferProgress.current / transferProgress.total) * 100))}%` }}
             >
               {transferProgress.current > transferProgress.total / 4 && `${transferProgress.current}/${transferProgress.total}`}
@@ -219,7 +219,7 @@ export default function PlaylistList() {
         </div>
         
         <div className="text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-1">
             {transferProgress.current} / {transferProgress.total} şarkı aktarıldı
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -227,8 +227,8 @@ export default function PlaylistList() {
           </p>
         </div>
         
-        <div className="mt-8 animate-pulse">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="mt-6 sm:mt-8 animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11l7-7 7 7M5 19l7-7 7 7" />
           </svg>
         </div>
@@ -238,7 +238,7 @@ export default function PlaylistList() {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-3 sm:px-4 sm:py-3 rounded text-sm sm:text-base">
         <p>{error}</p>
       </div>
     );
@@ -246,37 +246,37 @@ export default function PlaylistList() {
 
   if (playlists.length === 0) {
     return (
-      <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-        <p>You don't have any playlists or you didn't grant access to this application.</p>
+      <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-3 py-3 sm:px-4 sm:py-3 rounded text-sm sm:text-base">
+        <p>Hiç çalma listeniz yok veya bu uygulamaya erişim izni vermediniz.</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+    <div className="mt-4 sm:mt-6">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800 dark:text-white">
         Spotify Çalma Listeleriniz
       </h2>
       
       <div className="mb-4 flex flex-wrap gap-2">
         <button
           onClick={() => setSelectedPlaylists(playlists.map(p => p.id))}
-          className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
         >
           Tümünü Seç
         </button>
         <button
           onClick={() => setSelectedPlaylists([])}
-          className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md transition-colors"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md transition-colors"
         >
           Seçimi Temizle
         </button>
         {selectedPlaylists.length > 0 && (
           <button
             onClick={transferSelectedPlaylists}
-            className="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-md ml-auto transition-colors flex items-center"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-green-600 hover:bg-green-700 text-white rounded-md ml-auto transition-colors flex items-center"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7l4-4m0 0l4 4m-4-4v18" />
             </svg>
             {selectedPlaylists.length} Çalma Listesini Aktar
@@ -284,7 +284,7 @@ export default function PlaylistList() {
         )}
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {playlists.map(playlist => (
           <div
             key={playlist.id}
@@ -295,31 +295,31 @@ export default function PlaylistList() {
                 : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
             }`}
           >
-            <div className="flex p-4">
-              <div className="flex-shrink-0 w-16 h-16 mr-4 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800 relative">
+            <div className="flex p-3 sm:p-4">
+              <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 mr-3 sm:mr-4 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800 relative">
                 {playlist.images && playlist.images.length > 0 ? (
                   <Image
                     src={playlist.images[0].url}
                     alt={playlist.name}
                     fill
                     className="object-cover"
-                    sizes="64px"
+                    sizes="(max-width: 640px) 48px, 64px"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                     </svg>
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate">{playlist.name}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white truncate">{playlist.name}</h3>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                   {playlist.tracks.total} şarkı • {playlist.owner.display_name}
                 </p>
-                <div className="mt-2 flex items-center">
-                  <div className={`w-4 h-4 rounded-md mr-2 transition-colors ${
+                <div className="mt-1.5 sm:mt-2 flex items-center">
+                  <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-md mr-1.5 sm:mr-2 transition-colors ${
                     selectedPlaylists.includes(playlist.id) ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
                   }`}></div>
                   <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
@@ -333,15 +333,15 @@ export default function PlaylistList() {
       </div>
 
       {selectedPlaylists.length > 0 && (
-        <div className="mt-6 sticky bottom-4">
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <div>
-              <span className="font-medium text-gray-800 dark:text-white">{selectedPlaylists.length} çalma listesi</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">aktarım için seçildi</span>
+        <div className="mt-4 sm:mt-6 sticky bottom-4">
+          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div className="text-center sm:text-left">
+              <span className="font-medium text-gray-800 dark:text-white text-sm sm:text-base">{selectedPlaylists.length} çalma listesi</span>
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 ml-1 sm:ml-2">aktarım için seçildi</span>
             </div>
             <button
               onClick={transferSelectedPlaylists}
-              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors flex items-center"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors flex items-center justify-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7l4-4m0 0l4 4m-4-4v18" />

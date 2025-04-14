@@ -23,7 +23,7 @@ export const redirectToSpotifyAuth = () => {
     localStorage.removeItem('spotify_token');
     
     const clientId = '8f0b9e6febfe4ca18bc90f84078d672a';
-    const redirectUri = 'https://oauth.pstmn.io/v1/callback';
+    const redirectUri = 'https://spotify-to-youtube-pink.vercel.app/login';
     const scope = 'playlist-read-private playlist-read-collaborative';
     
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(

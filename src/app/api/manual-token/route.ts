@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     // Get Spotify token
     const clientId = process.env.SPOTIFY_CLIENT_ID || '8f0b9e6febfe4ca18bc90f84078d672a';
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET || '5d04c84ca4544d15a64290d779a3b394';
-    const redirectUri = 'https://oauth.pstmn.io/v1/callback';
+    const redirectUri = 'https://spotify-to-youtube-pink.vercel.app/login';
 
     try {
       const tokenData = await getSpotifyToken(code, clientId, clientSecret, redirectUri);

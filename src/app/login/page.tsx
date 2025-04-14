@@ -6,8 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 // Loading component
 function Loading() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-br from-gray-900 to-gray-800">
-      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8 max-w-md w-full">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6 sm:p-8 max-w-md w-full">
         <div className="animate-pulse flex flex-col items-center justify-center">
           <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-6"></div>
           <div className="h-32 bg-gray-300 dark:bg-gray-600 rounded w-full mb-4"></div>
@@ -78,7 +78,7 @@ function LoginContent() {
   const spotifyClientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || '8f0b9e6febfe4ca18bc90f84078d672a';
   
   // Use redirect URI that Spotify has specifically allowed
-  const redirectUri = 'https://oauth.pstmn.io/v1/callback';
+  const redirectUri = 'https://spotify-to-youtube-pink.vercel.app/login';
 
   const handleSpotifyConnect = () => {
     // Tell users to get URL and enter it manually
@@ -115,14 +115,14 @@ function LoginContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-br from-gray-900 to-gray-800">
-      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6 sm:p-8 max-w-md w-full">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">
           Spotify&apos;dan YouTube&apos;a Aktarım
         </h1>
         
         <div className="space-y-6">
-          <div className={`p-5 border border-gray-200 dark:border-gray-700 rounded-lg relative 
+          <div className={`p-4 sm:p-5 border border-gray-200 dark:border-gray-700 rounded-lg relative 
             ${isSpotifyConnected ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : ''}`}>
             
             {isSpotifyConnected && (
@@ -133,15 +133,15 @@ function LoginContent() {
               </div>
             )}
             
-            <h2 className="text-xl font-semibold mb-4 flex items-center text-gray-800 dark:text-white">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-green-600 text-white mr-3 text-sm">1</span>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center text-gray-800 dark:text-white">
+              <span className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-600 text-white mr-2 sm:mr-3 text-sm">1</span>
               Spotify Hesabınızı Bağlayın
             </h2>
             
             <button
               onClick={handleSpotifyConnect}
               disabled={isSpotifyConnected}
-              className={`w-full py-3 px-4 rounded-md flex items-center justify-center font-medium transition-all ${
+              className={`w-full py-3 px-4 rounded-md flex items-center justify-center font-medium text-base transition-all ${
                 isSpotifyConnected
                   ? 'bg-green-100 text-green-800 cursor-not-allowed'
                   : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-md'
@@ -173,11 +173,11 @@ function LoginContent() {
                   <li>"Success!" sayfasındaki URL'den "code" parametresini kopyalayın</li>
                   <li>Kopyaladığınız kodu aşağıdaki alana yapıştırın</li>
                 </ol>
-                <div className="mt-3 flex">
+                <div className="mt-3 flex flex-col sm:flex-row">
                   <input
                     type="text"
                     placeholder="Spotify kodunu buraya yapıştırın"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md sm:rounded-l-md sm:rounded-r-none text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 mb-2 sm:mb-0"
                     onChange={(e) => {
                       // If it's a URL, extract the code parameter
                       const value = e.target.value;
@@ -198,13 +198,18 @@ function LoginContent() {
                           if (data.access_token) {
                             setSpotifyToken(data.access_token);
                             router.replace('/login?spotify=connected');
+                          } else {
+                            alert('Geçersiz kod veya bir hata oluştu: ' + (data.error || 'Bilinmeyen hata'));
                           }
-                        } catch {
-                          alert('Token alınırken hata oluştu. Lütfen tekrar deneyin.');
+                        } catch (error) {
+                          console.error('Error exchanging code for token:', error);
+                          alert('Kod değişimi sırasında bir hata oluştu. Lütfen tekrar deneyin.');
                         }
+                      } else {
+                        alert('Lütfen geçerli bir Spotify kodu girin.');
                       }
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-r-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md sm:rounded-l-none sm:rounded-r-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full sm:w-auto"
                   >
                     Onayla
                   </button>
@@ -213,8 +218,8 @@ function LoginContent() {
             )}
           </div>
           
-          <div className="p-5 border border-gray-200 dark:border-gray-700 rounded-lg relative
-            ${isYoutubeConnected ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800' : ''}">
+          <div className={`p-4 sm:p-5 border border-gray-200 dark:border-gray-700 rounded-lg relative
+            ${isYoutubeConnected ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800' : ''}`}>
             
             {isYoutubeConnected && (
               <div className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1.5 shadow-md">
@@ -224,76 +229,63 @@ function LoginContent() {
               </div>
             )}
             
-            <h2 className="text-xl font-semibold mb-4 flex items-center text-gray-800 dark:text-white">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-red-600 text-white mr-3 text-sm">2</span>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center text-gray-800 dark:text-white">
+              <span className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-red-600 text-white mr-2 sm:mr-3 text-sm">2</span>
               YouTube Hesabınızı Bağlayın
             </h2>
             
-            {!isYoutubeConnected ? (
-              isSpotifyConnected ? (
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                YouTube hesabınıza bağlanmak için aşağıdaki butonu kullanın. YouTube Music&apos;e çalma listesi aktarabilmek için hesabınıza erişim izni gereklidir.
+              </p>
+              
+              {!isYoutubeConnected ? (
                 <GoogleOAuthProvider clientId="507925114398-mebhu3dam2er8m5ltovrmp98btf0mp4v.apps.googleusercontent.com">
                   <div className="flex justify-center">
                     <GoogleLogin
                       onSuccess={handleYoutubeSuccess}
-                      onError={() => console.error('YouTube Login Error')}
-                      useOneTap
-                      context="use"
-                      type="standard"
+                      onError={() => {
+                        console.log('YouTube login failed');
+                        alert('YouTube bağlantısı başarısız oldu. Lütfen tekrar deneyin.');
+                      }}
                       theme="filled_blue"
+                      shape="rectangular"
                       size="large"
-                      logo_alignment="left"
-                      width="280px"
-                      text="signin_with"
                     />
                   </div>
-                  <p className="text-xs text-center mt-3 text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-2 rounded">
-                    Giriş sırasında "Tüm Google hizmetlerini görün" seçeneğini işaretleyin ve YouTube'u seçin.
-                  </p>
                 </GoogleOAuthProvider>
               ) : (
-                <div className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span className="text-gray-600 dark:text-gray-300 text-sm">
-                    Önce Spotify'a bağlanmalısınız
+                <button
+                  disabled
+                  className="w-full py-3 px-4 bg-red-100 text-red-800 rounded-md flex items-center justify-center font-medium cursor-not-allowed"
+                >
+                  <span className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Bağlantı Kuruldu
                   </span>
-                </div>
-              )
-            ) : (
-              <div className="flex items-center justify-center py-3 bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300 rounded-md">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {isSpotifyConnected && isYoutubeConnected && (
+            <div className="mt-6 bg-green-50 dark:bg-green-900/10 p-4 rounded-lg border border-green-200 dark:border-green-800 text-center">
+              <p className="text-green-700 dark:text-green-300 mb-4">
+                Tebrikler! Artık çalma listelerinizi aktarmaya hazırsınız.
+              </p>
+              <Link 
+                href="/playlists"
+                className="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 hover:shadow-lg w-full"
+              >
+                <span>Çalma Listelerinizi Görüntüleyin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-                Bağlantı Kuruldu
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {(isSpotifyConnected && isYoutubeConnected) && (
-          <div className="mt-8 bg-gradient-to-r from-blue-500 to-purple-600 p-0.5 rounded-md shadow-lg">
-            <button
-              onClick={() => router.push('/playlists')}
-              className="w-full py-3 px-4 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-400 font-medium rounded-[3px] hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-              Çalma Listelerimi Göster
-            </button>
-          </div>
-        )}
-        
-        <div className="mt-8 text-center">
-          <Link href="/"
-            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Ana Sayfaya Dön
-          </Link>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>
