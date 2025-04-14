@@ -1,0 +1,6 @@
+[33md808439[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Değişiklikler yapıldı
+[33meaa45b8[m useSearchParams hook'u Suspense sınırı içine alarak Next.js 15 uyumluluğunu sağla
+[33md2a5d16[m ESLint kurallarını derleme sırasında devre dışı bırakarak Vercel deploy hatasını düzelt
+[33me6b16e9[m Update app features and API routes
+[33m11aabbe[m İlk commit: Spotify to YouTube çevirici uygulama
+[33m25b5308[m Initial commit from Create Next App
