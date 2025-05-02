@@ -10,22 +10,10 @@ interface LanguageSwitcherProps {
 export default function LanguageSwitcher({ currentLocale }: LanguageSwitcherProps) {
   const pathname = usePathname();
   
-  // Mevcut dil kodunu çıkarıp diğer dil kodunu ekleyerek yeni URL oluştur
+  // Mevcut rotadan locale'i çıkar ve yeni locale ile yeni rota oluştur
+  const pathnameWithoutLocale = pathname.replace(`/${currentLocale}`, '') || '/';
   const otherLocale = currentLocale === 'tr' ? 'en' : 'tr';
-  
-  // URL'i parçalara ayır
-  const segments = pathname.split('/').filter(Boolean);
-  
-  // İlk segment yerine diğer dil kodunu koy
-  if (segments.length > 0 && (segments[0] === 'tr' || segments[0] === 'en')) {
-    segments[0] = otherLocale;
-  } else {
-    // Eğer geçerli bir dil segmenti yoksa, diğer dili ekle
-    segments.unshift(otherLocale);
-  }
-  
-  // Yeni URL'i oluştur
-  const otherLocaleUrl = `/${segments.join('/')}`;
+  const otherLocaleUrl = `/${otherLocale}${pathnameWithoutLocale}`;
 
   return (
     <div className="flex items-center justify-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md hover:shadow-lg transition-all duration-200">
